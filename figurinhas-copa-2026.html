@@ -338,9 +338,9 @@
 </header>
 
 <div class="stats-bar">
-  <div class="stat total"><div class="num" id="s-total">1006</div><div class="lbl">Total</div></div>
+  <div class="stat total"><div class="num" id="s-total">980</div><div class="lbl">Total</div></div>
   <div class="stat tenho"><div class="num" id="s-tenho">0</div><div class="lbl">Tenho</div></div>
-  <div class="stat falta"><div class="num" id="s-falta">1006</div><div class="lbl">Faltam</div></div>
+  <div class="stat falta"><div class="num" id="s-falta">980</div><div class="lbl">Faltam</div></div>
   <div class="stat rep"><div class="num" id="s-rep">0</div><div class="lbl">Repetidas</div></div>
 </div>
 
@@ -369,13 +369,13 @@
 
 <script type="module">
 const TEAMS = [
-  // Introdução (fig. 00–09)
-  { name: "Introdução", flag: "🏆", count: 10, group: "Especiais", start: 0 },
+  // Introdução + Especiais
+  { name: "Introdução / Especiais", flag: "🏆", count: 20, group: "Especiais" },
   // Grupo A
   { name: "México", flag: "🇲🇽", count: 20, group: "Grupo A" },
   { name: "África do Sul", flag: "🇿🇦", count: 20, group: "Grupo A" },
   { name: "Coreia do Sul", flag: "🇰🇷", count: 20, group: "Grupo A" },
-  { name: "Tchéquia", flag: "🇨🇿", count: 20, group: "Grupo A" },
+  { name: "República Tcheca", flag: "🇨🇿", count: 20, group: "Grupo A" },
   // Grupo B
   { name: "Canadá", flag: "🇨🇦", count: 20, group: "Grupo B" },
   { name: "Bósnia e Herzegovina", flag: "🇧🇦", count: 20, group: "Grupo B" },
@@ -390,7 +390,7 @@ const TEAMS = [
   { name: "Estados Unidos", flag: "🇺🇸", count: 20, group: "Grupo D" },
   { name: "Paraguai", flag: "🇵🇾", count: 20, group: "Grupo D" },
   { name: "Austrália", flag: "🇦🇺", count: 20, group: "Grupo D" },
-  { name: "Türkiye", flag: "🇹🇷", count: 20, group: "Grupo D" },
+  { name: "Turquia", flag: "🇹🇷", count: 20, group: "Grupo D" },
   // Grupo E
   { name: "Alemanha", flag: "🇩🇪", count: 20, group: "Grupo E" },
   { name: "Curaçao", flag: "🇨🇼", count: 20, group: "Grupo E" },
@@ -402,38 +402,35 @@ const TEAMS = [
   { name: "Suécia", flag: "🇸🇪", count: 20, group: "Grupo F" },
   { name: "Tunísia", flag: "🇹🇳", count: 20, group: "Grupo F" },
   // Grupo G
-  { name: "Bélgica", flag: "🇧🇪", count: 20, group: "Grupo G" },
-  { name: "Egito", flag: "🇪🇬", count: 20, group: "Grupo G" },
-  { name: "Irã", flag: "🇮🇷", count: 20, group: "Grupo G" },
-  { name: "Nova Zelândia", flag: "🇳🇿", count: 20, group: "Grupo G" },
+  { name: "Argentina", flag: "🇦🇷", count: 20, group: "Grupo G" },
+  { name: "Chile", flag: "🇨🇱", count: 20, group: "Grupo G" },
+  { name: "Arábia Saudita", flag: "🇸🇦", count: 20, group: "Grupo G" },
+  { name: "Hungria", flag: "🇭🇺", count: 20, group: "Grupo G" },
   // Grupo H
   { name: "Espanha", flag: "🇪🇸", count: 20, group: "Grupo H" },
-  { name: "Cabo Verde", flag: "🇨🇻", count: 20, group: "Grupo H" },
-  { name: "Arábia Saudita", flag: "🇸🇦", count: 20, group: "Grupo H" },
-  { name: "Uruguai", flag: "🇺🇾", count: 20, group: "Grupo H" },
+  { name: "Nigéria", flag: "🇳🇬", count: 20, group: "Grupo H" },
+  { name: "Irlanda do Norte", flag: "🇬🇧", count: 20, group: "Grupo H" },
+  { name: "Panamá", flag: "🇵🇦", count: 20, group: "Grupo H" },
   // Grupo I
   { name: "França", flag: "🇫🇷", count: 20, group: "Grupo I" },
   { name: "Senegal", flag: "🇸🇳", count: 20, group: "Grupo I" },
-  { name: "Iraque", flag: "🇮🇶", count: 20, group: "Grupo I" },
   { name: "Noruega", flag: "🇳🇴", count: 20, group: "Grupo I" },
+  { name: "Nova Zelândia", flag: "🇳🇿", count: 20, group: "Grupo I" },
   // Grupo J
-  { name: "Argentina", flag: "🇦🇷", count: 20, group: "Grupo J" },
-  { name: "Argélia", flag: "🇩🇿", count: 20, group: "Grupo J" },
-  { name: "Áustria", flag: "🇦🇹", count: 20, group: "Grupo J" },
-  { name: "Jordânia", flag: "🇯🇴", count: 20, group: "Grupo J" },
+  { name: "Inglaterra", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", count: 20, group: "Grupo J" },
+  { name: "Egito", flag: "🇪🇬", count: 20, group: "Grupo J" },
+  { name: "Eslováquia", flag: "🇸🇰", count: 20, group: "Grupo J" },
+  { name: "Venezuela", flag: "🇻🇪", count: 20, group: "Grupo J" },
   // Grupo K
   { name: "Portugal", flag: "🇵🇹", count: 20, group: "Grupo K" },
-  { name: "Congo DR", flag: "🇨🇩", count: 20, group: "Grupo K" },
-  { name: "Uzbequistão", flag: "🇺🇿", count: 20, group: "Grupo K" },
-  { name: "Colômbia", flag: "🇨🇴", count: 20, group: "Grupo K" },
+  { name: "Irã", flag: "🇮🇷", count: 20, group: "Grupo K" },
+  { name: "Croácia", flag: "🇭🇷", count: 20, group: "Grupo K" },
+  { name: "Camarões", flag: "🇨🇲", count: 20, group: "Grupo K" },
   // Grupo L
-  { name: "Inglaterra", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", count: 20, group: "Grupo L" },
-  { name: "Croácia", flag: "🇭🇷", count: 20, group: "Grupo L" },
-  { name: "Gana", flag: "🇬🇭", count: 20, group: "Grupo L" },
-  { name: "Panamá", flag: "🇵🇦", count: 20, group: "Grupo L" },
-  // Especiais finais
-  { name: "Campeões Históricos", flag: "🥇", count: 22, group: "Especiais Finais" },
-  { name: "Coca-Cola", flag: "🥤", count: 14, group: "Especiais Finais" },
+  { name: "Bélgica", flag: "🇧🇪", count: 20, group: "Grupo L" },
+  { name: "Uruguai", flag: "🇺🇾", count: 20, group: "Grupo L" },
+  { name: "Colômbia", flag: "🇨🇴", count: 20, group: "Grupo L" },
+  { name: "Sérvia", flag: "🇷🇸", count: 20, group: "Grupo L" },
 ];
 
 // ── Firebase Realtime Database ──
@@ -492,8 +489,7 @@ function nextState(cur) { return cur === 0 ? 1 : cur === 1 ? 2 : 0; }
 function calcStats() {
   let tenho=0, repetida=0, total=0;
   TEAMS.forEach((t,ti) => {
-    const startNum = t.start !== undefined ? t.start : 1;
-    for (let si=startNum; si < startNum + t.count; si++) {
+    for (let si=1; si<=t.count; si++) {
       total++;
       const s = getSticker(ti, si);
       if (s===1) tenho++;
@@ -505,9 +501,8 @@ function calcStats() {
 
 function calcTeamStats(ti) {
   const t = TEAMS[ti];
-  const startNum = t.start !== undefined ? t.start : 1;
   let tenho=0, rep=0;
-  for (let si=startNum; si < startNum + t.count; si++) {
+  for (let si=1; si<=t.count; si++) {
     const s = getSticker(ti, si);
     if (s===1) tenho++;
     if (s===2) { tenho++; rep++; }
@@ -530,14 +525,13 @@ function renderStickerGrid(ti) {
   const grid = document.getElementById(`grid-${ti}`);
   if (!grid) return;
   grid.innerHTML = '';
-  const startNum = t.start !== undefined ? t.start : 1;
-  for (let si=startNum; si < startNum + t.count; si++) {
+  for (let si=1; si<=t.count; si++) {
     const s = getSticker(ti, si);
     const cls = ['falta','tenho','repetida'][s];
     const ico = ['','✓','★'][s];
     const div = document.createElement('div');
     div.className = `sticker ${cls}`;
-    div.innerHTML = `<span class="num">${String(si).padStart(si < 10 ? 2 : 1, '0')}</span><span class="ico">${ico}</span>`;
+    div.innerHTML = `<span class="num">${si}</span><span class="ico">${ico}</span>`;
     div.addEventListener('click', async () => {
       state[key(ti, si)] = nextState(s);
       await saveState();
