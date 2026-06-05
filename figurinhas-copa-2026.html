@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Álbum Copa 2026 — Controle de Figurinhas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --verde: #00a651;
+    --amarelo: #ffd700;
+    --azul: #003087;
+    --bg: #0a0f1e;
+    --card: #111827;
+    --card2: #1a2235;
+    --text: #e8eaf6;
+    --muted: #6b7280;
+    --border: #1f2d44;
+    --tenho: #00a651;
+    --falta: #374151;
+    --repetida: #f59e0b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, #001f5e 0%, #003087 50%, #004f20 100%);
+    padding: 20px 16px 16px;
+    text-align: center;
+    border-bottom: 3px solid var(--amarelo);
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,215,0,0.03) 20px, rgba(255,215,0,0.03) 40px);
+  }
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 3px;
+    color: var(--amarelo);
+    position: relative;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  }
+  header p {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.6);
+    margin-top: 4px;
+    position: relative;
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .stats-bar::-webkit-scrollbar { display: none; }
+  .stat {
+    flex: 1;
+    min-width: 80px;
+    background: var(--card2);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .stat .num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+  .stat .lbl { font-size: 0.65rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat.tenho .num { color: var(--tenho); }
+  .stat.falta .num { color: #ef4444; }
+  .stat.rep .num { color: var(--repetida); }
+  .stat.total .num { color: var(--amarelo); }
+
+  .progress-wrap {
+    padding: 10px 16px 6px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+  }
+  .progress-bar-bg {
+    background: var(--border);
+    border-radius: 999px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--verde), var(--amarelo));
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 4px;
+    text-align: right;
+  }
+
+  .controls {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+  }
+  .search-box {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 0.9rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-box:focus { border-color: var(--verde); }
+  .filters {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter-btn {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+  .filter-btn.active {
+    border-color: var(--verde);
+    color: var(--verde);
+    background: rgba(0,166,81,0.1);
+  }
+
+  .teams-list {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .team-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .team-card.complete { border-color: var(--verde); }
+
+  .team-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    cursor: pointer;
+    gap: 10px;
+    user-select: none;
+  }
+  .team-flag { font-size: 1.5rem; line-height: 1; }
+  .team-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    flex: 1;
+  }
+  .team-mini-stats {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .mini-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  .mini-badge.t { background: rgba(0,166,81,0.15); color: var(--tenho); }
+  .mini-badge.f { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .mini-badge.r { background: rgba(245,158,11,0.15); color: var(--repetida); }
+  .chevron {
+    color: var(--muted);
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+  }
+  .team-card.open .chevron { transform: rotate(180deg); }
+
+  .team-body {
+    display: none;
+    padding: 0 14px 14px;
+    border-top: 1px solid var(--border);
+  }
+  .team-card.open .team-body { display: block; }
+
+  .team-actions {
+    display: flex;
+    gap: 6px;
+    padding: 10px 0 8px;
+  }
+  .team-actions button {
+    flex: 1;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 7px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+  }
+  .team-actions button:hover { border-color: var(--verde); color: var(--verde); }
+
+  .stickers-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  .sticker {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 2px solid transparent;
+    position: relative;
+    font-size: 0.65rem;
+    font-weight: 600;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sticker .num { font-size: 0.8rem; font-weight: 700; }
+  .sticker .ico { font-size: 1rem; }
+  .sticker.falta {
+    background: var(--falta);
+    color: var(--muted);
+    border-color: #2d3748;
+  }
+  .sticker.tenho {
+    background: rgba(0,166,81,0.15);
+    border-color: var(--tenho);
+    color: var(--tenho);
+  }
+  .sticker.repetida {
+    background: rgba(245,158,11,0.15);
+    border-color: var(--repetida);
+    color: var(--repetida);
+  }
+  .sticker:active { transform: scale(0.92); }
+
+  .legend {
+    display: flex;
+    gap: 10px;
+    padding: 8px 16px 14px;
+    justify-content: center;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 3px;
+  }
+  .legend-dot.f { background: var(--falta); border: 1px solid #2d3748; }
+  .legend-dot.t { background: rgba(0,166,81,0.3); border: 1px solid var(--tenho); }
+  .legend-dot.r { background: rgba(245,158,11,0.3); border: 1px solid var(--repetida); }
+
+  .empty-msg {
+    text-align: center;
+    padding: 40px 16px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .group-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    color: var(--amarelo);
+    padding: 4px 4px 2px;
+    border-left: 3px solid var(--amarelo);
+    padding-left: 10px;
+    margin-top: 4px;
+  }
+
+  .team-progress {
+    height: 3px;
+    background: var(--border);
+    border-radius: 999px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .team-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--verde), var(--amarelo));
+    border-radius: 999px;
+    transition: width 0.3s;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚽ ÁLBUM COPA 2026</h1>
+  <p>Controle de Figurinhas • Panini FIFA World Cup™</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat total"><div class="num" id="s-total">980</div><div class="lbl">Total</div></div>
+  <div class="stat tenho"><div class="num" id="s-tenho">0</div><div class="lbl">Tenho</div></div>
+  <div class="stat falta"><div class="num" id="s-falta">980</div><div class="lbl">Faltam</div></div>
+  <div class="stat rep"><div class="num" id="s-rep">0</div><div class="lbl">Repetidas</div></div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar-bg"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="progress-label" id="prog-label">0% completo</div>
+</div>
+
+<div class="controls">
+  <input class="search-box" type="text" placeholder="🔍 Buscar seleção..." id="search-input" />
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all">Todas</button>
+    <button class="filter-btn" data-filter="complete">Completas ✅</button>
+    <button class="filter-btn" data-filter="started">Em andamento</button>
+    <button class="filter-btn" data-filter="empty">Não iniciadas</button>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot f"></div>Falta</div>
+  <div class="legend-item"><div class="legend-dot t"></div>Tenho</div>
+  <div class="legend-item"><div class="legend-dot r"></div>Repetida</div>
+</div>
+
+<div class="teams-list" id="teams-list"></div>
+
+<script>
+const TEAMS = [
+  // Introdução + Especiais
+  { name: "Introdução / Especiais", flag: "🏆", count: 20, group: "Especiais" },
+  // Grupo A
+  { name: "México", flag: "🇲🇽", count: 20, group: "Grupo A" },
+  { name: "África do Sul", flag: "🇿🇦", count: 20, group: "Grupo A" },
+  { name: "Coreia do Sul", flag: "🇰🇷", count: 20, group: "Grupo A" },
+  { name: "República Tcheca", flag: "🇨🇿", count: 20, group: "Grupo A" },
+  // Grupo B
+  { name: "Canadá", flag: "🇨🇦", count: 20, group: "Grupo B" },
+  { name: "Bósnia e Herzegovina", flag: "🇧🇦", count: 20, group: "Grupo B" },
+  { name: "Catar", flag: "🇶🇦", count: 20, group: "Grupo B" },
+  { name: "Suíça", flag: "🇨🇭", count: 20, group: "Grupo B" },
+  // Grupo C
+  { name: "Brasil", flag: "🇧🇷", count: 20, group: "Grupo C" },
+  { name: "Marrocos", flag: "🇲🇦", count: 20, group: "Grupo C" },
+  { name: "Haiti", flag: "🇭🇹", count: 20, group: "Grupo C" },
+  { name: "Escócia", flag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", count: 20, group: "Grupo C" },
+  // Grupo D
+  { name: "Estados Unidos", flag: "🇺🇸", count: 20, group: "Grupo D" },
+  { name: "Paraguai", flag: "🇵🇾", count: 20, group: "Grupo D" },
+  { name: "Austrália", flag: "🇦🇺", count: 20, group: "Grupo D" },
+  { name: "Turquia", flag: "🇹🇷", count: 20, group: "Grupo D" },
+  // Grupo E
+  { name: "Alemanha", flag: "🇩🇪", count: 20, group: "Grupo E" },
+  { name: "Curaçao", flag: "🇨🇼", count: 20, group: "Grupo E" },
+  { name: "Costa do Marfim", flag: "🇨🇮", count: 20, group: "Grupo E" },
+  { name: "Equador", flag: "🇪🇨", count: 20, group: "Grupo E" },
+  // Grupo F
+  { name: "Holanda", flag: "🇳🇱", count: 20, group: "Grupo F" },
+  { name: "Japão", flag: "🇯🇵", count: 20, group: "Grupo F" },
+  { name: "Suécia", flag: "🇸🇪", count: 20, group: "Grupo F" },
+  { name: "Tunísia", flag: "🇹🇳", count: 20, group: "Grupo F" },
+  // Grupo G
+  { name: "Argentina", flag: "🇦🇷", count: 20, group: "Grupo G" },
+  { name: "Chile", flag: "🇨🇱", count: 20, group: "Grupo G" },
+  { name: "Arábia Saudita", flag: "🇸🇦", count: 20, group: "Grupo G" },
+  { name: "Hungria", flag: "🇭🇺", count: 20, group: "Grupo G" },
+  // Grupo H
+  { name: "Espanha", flag: "🇪🇸", count: 20, group: "Grupo H" },
+  { name: "Nigéria", flag: "🇳🇬", count: 20, group: "Grupo H" },
+  { name: "Irlanda do Norte", flag: "🇬🇧", count: 20, group: "Grupo H" },
+  { name: "Panamá", flag: "🇵🇦", count: 20, group: "Grupo H" },
+  // Grupo I
+  { name: "França", flag: "🇫🇷", count: 20, group: "Grupo I" },
+  { name: "Senegal", flag: "🇸🇳", count: 20, group: "Grupo I" },
+  { name: "Noruega", flag: "🇳🇴", count: 20, group: "Grupo I" },
+  { name: "Nova Zelândia", flag: "🇳🇿", count: 20, group: "Grupo I" },
+  // Grupo J
+  { name: "Inglaterra", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", count: 20, group: "Grupo J" },
+  { name: "Egito", flag: "🇪🇬", count: 20, group: "Grupo J" },
+  { name: "Eslováquia", flag: "🇸🇰", count: 20, group: "Grupo J" },
+  { name: "Venezuela", flag: "🇻🇪", count: 20, group: "Grupo J" },
+  // Grupo K
+  { name: "Portugal", flag: "🇵🇹", count: 20, group: "Grupo K" },
+  { name: "Irã", flag: "🇮🇷", count: 20, group: "Grupo K" },
+  { name: "Croácia", flag: "🇭🇷", count: 20, group: "Grupo K" },
+  { name: "Camarões", flag: "🇨🇲", count: 20, group: "Grupo K" },
+  // Grupo L
+  { name: "Bélgica", flag: "🇧🇪", count: 20, group: "Grupo L" },
+  { name: "Uruguai", flag: "🇺🇾", count: 20, group: "Grupo L" },
+  { name: "Colômbia", flag: "🇨🇴", count: 20, group: "Grupo L" },
+  { name: "Sérvia", flag: "🇷🇸", count: 20, group: "Grupo L" },
+];
+
+// State: 0=falta, 1=tenho, 2=repetida
+let state = {};
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('copa2026_v2');
+    if (saved) state = JSON.parse(saved);
+  } catch(e) {}
+}
+
+function saveState() {
+  try { localStorage.setItem('copa2026_v2', JSON.stringify(state)); } catch(e) {}
+}
+
+function key(ti, si) { return `${ti}_${si}`; }
+
+function getSticker(ti, si) { return state[key(ti,si)] || 0; }
+
+function nextState(cur) {
+  if (cur === 0) return 1;
+  if (cur === 1) return 2;
+  return 0;
+}
+
+function calcStats() {
+  let tenho=0, repetida=0, total=0;
+  TEAMS.forEach((t,ti) => {
+    for (let si=1; si<=t.count; si++) {
+      total++;
+      const s = getSticker(ti, si);
+      if (s===1) tenho++;
+      if (s===2) { tenho++; repetida++; }
+    }
+  });
+  return { tenho, repetida, falta: total-tenho, total };
+}
+
+function calcTeamStats(ti) {
+  const t = TEAMS[ti];
+  let tenho=0, rep=0;
+  for (let si=1; si<=t.count; si++) {
+    const s = getSticker(ti, si);
+    if (s===1) tenho++;
+    if (s===2) { tenho++; rep++; }
+  }
+  return { tenho, rep, falta: t.count - tenho };
+}
+
+function updateGlobalStats() {
+  const s = calcStats();
+  document.getElementById('s-tenho').textContent = s.tenho;
+  document.getElementById('s-falta').textContent = s.falta;
+  document.getElementById('s-rep').textContent = s.repetida;
+  const pct = Math.round((s.tenho / s.total) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `${pct}% completo — ${s.tenho} de ${s.total}`;
+}
+
+function renderStickerGrid(ti) {
+  const t = TEAMS[ti];
+  const grid = document.getElementById(`grid-${ti}`);
+  if (!grid) return;
+  grid.innerHTML = '';
+  for (let si=1; si<=t.count; si++) {
+    const s = getSticker(ti, si);
+    const cls = ['falta','tenho','repetida'][s];
+    const ico = ['','✓','★'][s];
+    const div = document.createElement('div');
+    div.className = `sticker ${cls}`;
+    div.innerHTML = `<span class="num">${si}</span><span class="ico">${ico}</span>`;
+    div.addEventListener('click', () => {
+      state[key(ti, si)] = nextState(s);
+      saveState();
+      renderStickerGrid(ti);
+      updateTeamHeader(ti);
+      updateGlobalStats();
+    });
+    grid.appendChild(div);
+  }
+}
+
+function updateTeamHeader(ti) {
+  const ts = calcTeamStats(ti);
+  const t = TEAMS[ti];
+  const card = document.getElementById(`card-${ti}`);
+  if (!card) return;
+  card.querySelector('.mini-t').textContent = ts.tenho;
+  card.querySelector('.mini-f').textContent = ts.falta;
+  card.querySelector('.mini-r').textContent = ts.rep;
+  const pct = (ts.tenho / t.count) * 100;
+  card.querySelector('.team-progress-fill').style.width = pct + '%';
+  if (ts.falta === 0) card.classList.add('complete');
+  else card.classList.remove('complete');
+}
+
+function buildTeamCard(ti) {
+  const t = TEAMS[ti];
+  const ts = calcTeamStats(ti);
+  const pct = (ts.tenho / t.count) * 100;
+
+  const card = document.createElement('div');
+  card.className = 'team-card';
+  card.id = `card-${ti}`;
+  if (ts.falta === 0) card.classList.add('complete');
+
+  card.innerHTML = `
+    <div class="team-header">
+      <span class="team-flag">${t.flag}</span>
+      <span class="team-name">${t.name}</span>
+      <div class="team-mini-stats">
+        <span class="mini-badge t mini-t">${ts.tenho}</span>
+        <span class="mini-badge f mini-f">${ts.falta}</span>
+        <span class="mini-badge r mini-r">${ts.rep}</span>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="team-body">
+      <div class="team-progress"><div class="team-progress-fill" style="width:${pct}%"></div></div>
+      <div class="team-actions">
+        <button data-ti="${ti}" data-action="all">✓ Marcar todas</button>
+        <button data-ti="${ti}" data-action="none">✗ Limpar todas</button>
+      </div>
+      <div class="stickers-grid" id="grid-${ti}"></div>
+    </div>
+  `;
+
+  card.querySelector('.team-header').addEventListener('click', () => {
+    card.classList.toggle('open');
+    if (card.classList.contains('open')) renderStickerGrid(ti);
+  });
+
+  card.querySelector('[data-action="all"]').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const ti2 = parseInt(e.target.dataset.ti);
+    for (let si=1; si<=TEAMS[ti2].count; si++) state[key(ti2,si)] = 1;
+    saveState(); renderStickerGrid(ti2); updateTeamHeader(ti2); updateGlobalStats();
+  });
+  card.querySelector('[data-action="none"]').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const ti2 = parseInt(e.target.dataset.ti);
+    for (let si=1; si<=TEAMS[ti2].count; si++) delete state[key(ti2,si)];
+    saveState(); renderStickerGrid(ti2); updateTeamHeader(ti2); updateGlobalStats();
+  });
+
+  return card;
+}
+
+let currentFilter = 'all';
+let currentSearch = '';
+
+function renderTeams() {
+  const list = document.getElementById('teams-list');
+  list.innerHTML = '';
+  let shown = 0;
+  let lastGroup = null;
+
+  TEAMS.forEach((t, ti) => {
+    const ts = calcTeamStats(ti);
+    const name = t.name.toLowerCase();
+    const search = currentSearch.toLowerCase();
+
+    if (currentSearch && !name.includes(search)) return;
+    if (currentFilter === 'complete' && ts.falta > 0) return;
+    if (currentFilter === 'started' && (ts.tenho === 0 || ts.falta === 0)) return;
+    if (currentFilter === 'empty' && ts.tenho > 0) return;
+
+    if (!currentSearch && t.group !== lastGroup) {
+      const div = document.createElement('div');
+      div.className = 'group-label';
+      div.textContent = t.group;
+      list.appendChild(div);
+      lastGroup = t.group;
+    }
+
+    list.appendChild(buildTeamCard(ti));
+    shown++;
+  });
+
+  if (shown === 0) {
+    list.innerHTML = '<div class="empty-msg">Nenhuma seleção encontrada 🔍</div>';
+  }
+}
+
+// Init
+loadState();
+updateGlobalStats();
+renderTeams();
+
+document.getElementById('search-input').addEventListener('input', e => {
+  currentSearch = e.target.value;
+  renderTeams();
+});
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderTeams();
+  });
+});
+</script>
+</body>
+</html>
