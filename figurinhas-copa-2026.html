@@ -367,7 +367,7 @@
 
 <div class="teams-list" id="teams-list"></div>
 
-<script>
+<script type="module">
 const TEAMS = [
   // Introdução + Especiais
   { name: "Introdução / Especiais", flag: "🏆", count: 20, group: "Especiais" },
@@ -433,29 +433,58 @@ const TEAMS = [
   { name: "Sérvia", flag: "🇷🇸", count: 20, group: "Grupo L" },
 ];
 
+// ── Firebase Realtime Database ──
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAkV1tQyRWdGZ3OgzrmXCGx1n_Cu7AoP4U",
+  authDomain: "figurinhas-copa-2026-7ff05.firebaseapp.com",
+  databaseURL: "https://figurinhas-copa-2026-7ff05-default-rtdb.firebaseio.com",
+  projectId: "figurinhas-copa-2026-7ff05",
+  storageBucket: "figurinhas-copa-2026-7ff05.firebasestorage.app",
+  messagingSenderId: "391100674896",
+  appId: "1:391100674896:web:91831008db108c8e9d7255"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getDatabase(firebaseApp);
+const albumRef = ref(db, 'album/enrico');
+
+async function loadState() {
+  return new Promise((resolve) => {
+    onValue(albumRef, (snapshot) => {
+      state = snapshot.val() || {};
+      resolve();
+    }, { onlyOnce: true });
+  });
+}
+
+async function saveState() {
+  await set(albumRef, state);
+}
+
+// ── Auto-sync em tempo real ──
+onValue(albumRef, (snapshot) => {
+  const newState = snapshot.val() || {};
+  if (JSON.stringify(newState) !== JSON.stringify(state)) {
+    state = newState;
+    updateGlobalStats();
+    document.querySelectorAll('.team-card.open').forEach(card => {
+      const ti = parseInt(card.id.replace('card-',''));
+      renderStickerGrid(ti);
+      updateTeamHeader(ti);
+    });
+    TEAMS.forEach((_,ti) => updateTeamHeader(ti));
+  }
+});
+
 // State: 0=falta, 1=tenho, 2=repetida
 let state = {};
 
-function loadState() {
-  try {
-    const saved = localStorage.getItem('copa2026_v2');
-    if (saved) state = JSON.parse(saved);
-  } catch(e) {}
-}
-
-function saveState() {
-  try { localStorage.setItem('copa2026_v2', JSON.stringify(state)); } catch(e) {}
-}
-
 function key(ti, si) { return `${ti}_${si}`; }
-
 function getSticker(ti, si) { return state[key(ti,si)] || 0; }
-
-function nextState(cur) {
-  if (cur === 0) return 1;
-  if (cur === 1) return 2;
-  return 0;
-}
+function nextState(cur) { return cur === 0 ? 1 : cur === 1 ? 2 : 0; }
 
 function calcStats() {
   let tenho=0, repetida=0, total=0;
@@ -503,9 +532,9 @@ function renderStickerGrid(ti) {
     const div = document.createElement('div');
     div.className = `sticker ${cls}`;
     div.innerHTML = `<span class="num">${si}</span><span class="ico">${ico}</span>`;
-    div.addEventListener('click', () => {
+    div.addEventListener('click', async () => {
       state[key(ti, si)] = nextState(s);
-      saveState();
+      await saveState();
       renderStickerGrid(ti);
       updateTeamHeader(ti);
       updateGlobalStats();
@@ -564,17 +593,17 @@ function buildTeamCard(ti) {
     if (card.classList.contains('open')) renderStickerGrid(ti);
   });
 
-  card.querySelector('[data-action="all"]').addEventListener('click', (e) => {
+  card.querySelector('[data-action="all"]').addEventListener('click', async (e) => {
     e.stopPropagation();
     const ti2 = parseInt(e.target.dataset.ti);
     for (let si=1; si<=TEAMS[ti2].count; si++) state[key(ti2,si)] = 1;
-    saveState(); renderStickerGrid(ti2); updateTeamHeader(ti2); updateGlobalStats();
+    await saveState(); renderStickerGrid(ti2); updateTeamHeader(ti2); updateGlobalStats();
   });
-  card.querySelector('[data-action="none"]').addEventListener('click', (e) => {
+  card.querySelector('[data-action="none"]').addEventListener('click', async (e) => {
     e.stopPropagation();
     const ti2 = parseInt(e.target.dataset.ti);
     for (let si=1; si<=TEAMS[ti2].count; si++) delete state[key(ti2,si)];
-    saveState(); renderStickerGrid(ti2); updateTeamHeader(ti2); updateGlobalStats();
+    await saveState(); renderStickerGrid(ti2); updateTeamHeader(ti2); updateGlobalStats();
   });
 
   return card;
@@ -617,9 +646,13 @@ function renderTeams() {
 }
 
 // Init
-loadState();
-updateGlobalStats();
-renderTeams();
+(async () => {
+  document.getElementById('teams-list').innerHTML = '<div class="empty-msg">Carregando... ⏳</div>';
+  await loadState();
+  updateGlobalStats();
+  renderTeams();
+  TEAMS.forEach((_,ti) => updateTeamHeader(ti));
+})();
 
 document.getElementById('search-input').addEventListener('input', e => {
   currentSearch = e.target.value;
